@@ -1,9 +1,45 @@
+---
+
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="emerald">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sensor de Gas</title>
   </head>
-  <body> </body>
+  <body>
+    <div class="navbar bg-primary">
+      <a class="btn btn-ghost text-xl">Sensor de Gas</a>
+    </div>
+
+    <div class="flex flex-col h-56 justify-center items-center">
+      <button class="btn btn-md btn-primary" id="request-access"
+        >Conectar a Arduino</button
+      >
+
+      <div id="status" class="btn btn-ghost btn-lg">Ambiente sin gas</div>
+    </div>
+  </body>
 </html>
+
+<script>
+  import * as SimpleWebSerial from "simple-web-serial";
+  const connection = SimpleWebSerial.setupSerialConnection({
+    requestElement: "request-access",
+  });
+
+  const status = document.getElementById("status")! as HTMLButtonElement;
+
+  connection.on("smoke", function (data: string) {
+    if (data == "true") {
+      status.innerText = "Gas detectado";
+      // status.classList.toggle("btn-ghost");
+      // status.classList.toggle("btn-error");
+    } else {
+      status.innerText = "Ambiente sin gas";
+      // status.classList.toggle("btn-ghost");
+      // status.classList.toggle("btn-error");
+    }
+  });
+</script>

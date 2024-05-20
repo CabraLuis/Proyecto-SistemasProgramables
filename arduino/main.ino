@@ -2,39 +2,26 @@
 
 SimpleWebSerial WebSerial;
 
-int buttonPin = 3;
-int ledPin = 2;
-int sensorPin = A0;
-int sensorThreshold = 500;
-int analogSensor = 0;
-int buttonState = 0;
+int outputPin = 2;
+int sensorPin = 3;
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT);
-  pinMode(sensorPin, INPUT);
+  pinMode(outputPin, OUTPUT);
+  pinMode(sensorPin, INPUT_PULLUP);
   Serial.begin(57600);
 }
 
 void loop() {
-  // analogSensor = analogRead(sensorPin);
-  buttonState = digitalRead(buttonPin);
+    bool sensorState = digitalRead(sensorPin);
+    Serial.println(sensorState);
 
-  if (buttonState == HIGH) {
-    digitalWrite(ledPin, HIGH);
-    WebSerial.send("smoke", "true");
-  } else {
-    digitalWrite(ledPin, LOW);
+  if (sensorState) {
+    digitalWrite(outputPin, LOW);
     WebSerial.send("smoke", "false");
+  } else {
+    digitalWrite(outputPin, HIGH);
+    WebSerial.send("smoke", "true");
   }
 
-  delay(50);
-
-//   if (analogSensor > sensorThreshold) {
-//     WebSerial.send("smoke", "true");
-//     digitalWrite(ledPin, HIGH);
-//   } else {
-//     digitalWrite(ledPin, LOW);
-//     WebSerial.send("smoke", "false");
-//   }
+  delay(100);
 }
