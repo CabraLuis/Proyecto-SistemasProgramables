@@ -3,22 +3,39 @@
 ---
 
 <!doctype html>
-<html lang="en" data-theme="emerald">
+<html lang="en" data-theme="emerald" class="w-screen h-screen">
   <head>
     <meta charset="UTF-8" />
     <title>Sensor de Gas</title>
   </head>
-  <body>
-    <div class="navbar bg-primary">
+  <body class="bg-purple-100 w-full h-full">
+    <div class="navbar bg-purple-400">
       <a class="btn btn-ghost text-xl">Sensor de Gas</a>
     </div>
 
-    <div class="flex flex-col h-56 justify-center items-center">
-      <button class="btn btn-md btn-primary" id="request-access"
-        >Conectar a Arduino</button
-      >
+    <div class="grid grid-cols-4 gap-4 w-full h-full">
+      <div class="col-span-2">
+        <div class="font-bold text-lg">Conexión</div>
+        <button class="btn btn-lg btn-info w-full" id="request-access"
+          >Conectar a Arduino</button
+        >
+      </div>
 
-      <div id="status" class="btn btn-ghost btn-lg">Ambiente sin gas</div>
+      <div class="col-span-2">
+        <div class="font-bold text-lg">Ventilador</div>
+        <img id="fan" src="fan.png" width="100" class="paused" />
+      </div>
+
+      <div class="col-span-2">
+        <div class="font-bold text-lg">Estado</div>
+        <div id="status" class="btn btn-ghost btn-lg w-full">
+          Ambiente sin gas
+        </div>
+      </div>
+
+      <div class="col-span-2">
+        <div class="font-bold text-lg">Historial</div>
+      </div>
     </div>
   </body>
 </html>
@@ -30,16 +47,37 @@
   });
 
   const status = document.getElementById("status")! as HTMLButtonElement;
+  const dangerSound = new Audio("danger.mp3") as HTMLAudioElement;
+  const fan = document.getElementById("fan") as HTMLImageElement;
 
   connection.on("smoke", function (data: string) {
     if (data == "true") {
       status.innerText = "Gas detectado";
-      // status.classList.toggle("btn-ghost");
-      // status.classList.toggle("btn-error");
+      status.classList.replace("btn-ghost", "btn-error");
+      dangerSound.play();
+      fan.classList.remove("paused");
     } else {
       status.innerText = "Ambiente sin gas";
-      // status.classList.toggle("btn-ghost");
-      // status.classList.toggle("btn-error");
+      status.classList.replace("btn-error", "btn-ghost");
+      dangerSound.pause();
+      fan.classList.add("paused");
     }
   });
 </script>
+
+<style>
+  .paused {
+    animation-play-state: paused !important;
+  }
+
+  #fan {
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+</style>
