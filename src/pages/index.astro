@@ -24,6 +24,11 @@
           </div>
 
           <div id="status" class="btn btn-ghost btn-lg">Ambiente sin gas</div>
+          <progress
+            id="concentration"
+            class="progress progress-primary w-56"
+            value="0"
+            max="500"></progress>
         </div>
       </div>
     </div>
@@ -39,18 +44,22 @@
   const status = document.getElementById("status")! as HTMLButtonElement;
   const dangerSound = new Audio("danger.mp3") as HTMLAudioElement;
   const fan = document.getElementById("fan") as HTMLImageElement;
+  const concentrationBar = document.getElementById(
+    "concentration"
+  ) as HTMLProgressElement;
 
   connection.on("smoke", function (data: string) {
-    if (data == "true") {
-      status.innerText = "Gas detectado";
-      status.classList.replace("btn-ghost", "btn-error");
-      dangerSound.play();
-      fan.classList.remove("paused");
-    } else {
-      status.innerText = "Ambiente sin gas";
-      status.classList.replace("btn-error", "btn-ghost");
-      dangerSound.pause();
+    let concentration = parseFloat(data);
+    concentrationBar.value = concentration;
+    if (concentration < 300) {
       fan.classList.add("paused");
+      dangerSound.pause();
+    } else if (concentration >= 300 && concentration <= 400) {
+      fan.classList.remove("paused");
+      dangerSound.play();
+    } else if (concentration >= 400) {
+      fan.classList.remove("paused");
+      dangerSound.play();
     }
   });
 </script>

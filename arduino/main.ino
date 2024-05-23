@@ -3,23 +3,22 @@
 SimpleWebSerial WebSerial;
 
 int outputPin = 2;
-int sensorPin = 3;
+int sensorPin = A0;
 
 void setup() {
   pinMode(outputPin, OUTPUT);
-  pinMode(sensorPin, INPUT_PULLUP);
   Serial.begin(57600);
 }
 
 void loop() {
-    bool sensorState = digitalRead(sensorPin);
+    float sensorState = analogRead(sensorPin);
     Serial.println(sensorState);
 
-  if (sensorState) {
-    digitalWrite(outputPin, LOW);
+  if (sensorState > 300.00) {
+    digitalWrite(outputPin, HIGH);
     WebSerial.send("smoke", "false");
   } else {
-    digitalWrite(outputPin, HIGH);
+    digitalWrite(outputPin, LOW);
     WebSerial.send("smoke", "true");
   }
 
