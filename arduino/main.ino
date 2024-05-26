@@ -16,10 +16,10 @@ void loop() {
 
   if (sensorState > 300.00) {
     digitalWrite(outputPin, HIGH);
-    WebSerial.send("smoke", "false");
+    WebSerial.send("smoke", sensorState);
   } else {
     digitalWrite(outputPin, LOW);
-    WebSerial.send("smoke", "true");
+    WebSerial.send("smoke", sensorState);
   }
 
   delay(100);

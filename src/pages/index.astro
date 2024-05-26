@@ -9,28 +9,20 @@
     <title>Sensor de Gas</title>
   </head>
   <body>
-    <div class="navbar bg-gradient-to-r from-blue-200 to-cyan-200 absolute">
-      <a class="btn btn-ghost text-xl">Sensor de Gas</a>
-    </div>
-    <div class="hero min-h-screen bg-gradient-to-r from-gray-100 to-gray-300">
-      <div class="hero-content text-center">
-        <div class="max-w-md">
-          <button
-            class="btn btn-lg bg-gradient-to-r from-cyan-500 to-blue-500"
-            id="request-access">Conectar a Arduino</button
-          >
-          <div class="flex justify-center items-center py-4">
-            <img id="fan" src="fan.png" width="130" class="paused" />
-          </div>
+    <img src="kitchen.jpg" class="" />
 
-          <div id="status" class="btn btn-ghost btn-lg">Ambiente sin gas</div>
-          <progress
-            id="concentration"
-            class="progress progress-primary w-56"
-            value="0"
-            max="500"></progress>
-        </div>
-      </div>
+    <img
+      id="fan"
+      src="fan.png"
+      width="75"
+      class="paused fixed z-50 top-52 left-64"
+    />
+
+    <div id="status" class="btn btn-ghost btn-md">Ambiente sin gas</div>
+    <div class="semaforo">
+      <div id="verde" class="luz verde"></div>
+      <div id="amarillo" class="luz amarillo opacity-0"></div>
+      <div id="rojo" class="luz rojo opacity-0"></div>
     </div>
   </body>
 </html>
@@ -38,28 +30,39 @@
 <script>
   import * as SimpleWebSerial from "simple-web-serial";
   const connection = SimpleWebSerial.setupSerialConnection({
-    requestElement: "request-access",
+    requestAccessOnPageLoad: true,
   });
 
   const status = document.getElementById("status")! as HTMLButtonElement;
   const dangerSound = new Audio("danger.mp3") as HTMLAudioElement;
   const fan = document.getElementById("fan") as HTMLImageElement;
-  const concentrationBar = document.getElementById(
-    "concentration"
-  ) as HTMLProgressElement;
+  const green = document.getElementById("verde") as HTMLDivElement;
+  const yellow = document.getElementById("amarillo") as HTMLDivElement;
+  const red = document.getElementById("rojo") as HTMLDivElement;
 
   connection.on("smoke", function (data: string) {
     let concentration = parseFloat(data);
-    concentrationBar.value = concentration;
     if (concentration < 300) {
+      status.innerHTML = "Ambiente sin gas";
       fan.classList.add("paused");
       dangerSound.pause();
+      green.classList.remove("opacity-0");
+      yellow.classList.add("opacity-0");
+      red.classList.add("opacity-0");
     } else if (concentration >= 300 && concentration <= 400) {
+      status.innerHTML = "Gas detectado";
       fan.classList.remove("paused");
-      dangerSound.play();
+      dangerSound.pause();
+      green.classList.add("opacity-0");
+      yellow.classList.remove("opacity-0");
+      red.classList.add("opacity-0");
     } else if (concentration >= 400) {
+      status.innerHTML = "Alta concentracion de gas";
       fan.classList.remove("paused");
       dangerSound.play();
+      green.classList.add("opacity-0");
+      yellow.classList.add("opacity-0");
+      red.classList.remove("opacity-0");
     }
   });
 </script>
@@ -75,8 +78,35 @@
 
   @keyframes spin {
     100% {
-      -webkit-transform: rotate(-360deg);
-      transform: rotate(-360deg);
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
     }
+  }
+
+  .semaforo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -40px;
+    margin-left: -550px;
+  }
+
+  .luz {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 0 10px;
+  }
+
+  .rojo {
+    background-color: red;
+  }
+
+  .amarillo {
+    background-color: yellow;
+  }
+
+  .verde {
+    background-color: green;
   }
 </style>
